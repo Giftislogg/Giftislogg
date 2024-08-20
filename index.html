@@ -1,332 +1,196 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Public Chat</title>
     <style>
-        /* Basic reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
-            height: 100%;
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-        }
-
-        /* Main chat content */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 180px); /* Account for nav, input, and search */
+        /* Basic styling for the chat interface */
+        #chatContainer {
+            max-height: 400px;
             overflow-y: auto;
+            border: 1px solid #ccc;
             padding: 10px;
-        }
-
-        .chat-bubble {
-            display: flex;
-            align-items: flex-start;
             margin-bottom: 10px;
         }
-
-        .chat-bubble img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
+        .message {
+            margin-bottom: 10px;
         }
-
-        .chat-bubble .message {
-            background-color: #6200EE;
-            color: white;
-            padding: 10px;
-            border-radius: 10px;
-            max-width: 70%;
-            word-wrap: break-word;
+        .message strong {
+            color: #333;
         }
-
-        .chat-bubble .roleplay-name {
-            font-weight: bold;
-            margin-right: 5px;
-        }
-
-        /* Search bar */
-        .search-container {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background-color: #fff;
-            border-bottom: 1px solid #ccc;
-            transition: height 0.3s ease;
-        }
-
-        .search-container input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            outline: none;
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-        .search-container .search-icon {
-            font-size: 20px;
-            margin-right: 10px;
-        }
-
-        .search-container .toggle-search {
-            cursor: pointer;
-            font-size: 20px;
-            transform: rotate(0deg);
-            transition: transform 0.3s ease;
-        }
-
-        .collapsed .toggle-search {
-            transform: rotate(-90deg);
-        }
-
-        .collapsed .search-container {
-            display: none;
-        }
-
-        /* Chat input container */
-        .input-container {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 60px; /* Adjust based on the height of the bottom nav */
-            width: 100%;
-            background-color: #fff;
-            box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .input-container input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            outline: none;
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-        .input-container button {
-            background-color: #6200EE;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        /* Bottom Navigation Bar */
-        .bottom-nav {
+        /* Styling for the navigation bar */
+        .navbar {
             position: fixed;
             bottom: 0;
             width: 100%;
-            height: 60px;
             background-color: #333;
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.15);
+            padding: 10px 0;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
         }
-
-        .nav-item {
-            flex: 1;
-            text-align: center;
+        .navbar div {
             color: white;
-            text-decoration: none;
-            padding: 10px;
-            transition: background-color 0.3s ease;
-        }
-
-        .nav-item:hover {
-            background-color: #555;
-        }
-
-        .nav-icon {
-            display: block;
-            font-size: 24px;
-        }
-
-        .nav-text {
-            font-size: 12px;
-            margin-top: 2px;
-        }
-
-        .active {
-            background-color: #6200EE;
-        }
-
-        /* Roleplay name prompt */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .prompt-box {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 80%;
-            max-width: 300px;
-        }
-
-        .prompt-box input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            outline: none;
-            font-size: 16px;
-        }
-
-        .prompt-box button {
-            background-color: #6200EE;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
             cursor: pointer;
-            font-size: 16px;
+        }
+        .navbar div.active {
+            font-weight: bold;
+        }
+        .search-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .search-container input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .search-container button {
+            padding: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-container button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+        .welcome-dialog {
+            display: block;
+            position: fixed;
+            top: 20%;
+            left: 20%;
+            width: 60%;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <!-- Search bar -->
-    <div id="searchContainer" class="search-container">
-        <span class="search-icon">🔎</span>
-        <input type="text" id="searchInput" placeholder="Search messages..." onkeyup="filterMessages()">
-        <span class="toggle-search" onclick="toggleSearch()">^</span>
+    <!-- Welcome Dialog -->
+    <div id="welcomeDialog" class="welcome-dialog">
+        <h2>Welcome!</h2>
+        <p>Please enter your roleplay name:</p>
+        <input type="text" id="roleplayNameInput" placeholder="Name_Surname">
+        <button onclick="setRoleplayName()">OK</button>
     </div>
 
-    <!-- Main chat content -->
-    <div class="chat-container" id="chatContainer">
-        <!-- Chat bubbles will appear here -->
+    <!-- Search Bar -->
+    <div class="search-container hidden" id="searchContainer">
+        <input type="text" id="searchInput" placeholder="Search messages...">
+        <button onclick="searchMessages()">🔎</button>
+        <button onclick="toggleSearch()">^</button>
     </div>
 
-    <!-- Chat input area -->
-    <div class="input-container">
-        <input type="text" id="chatInput" placeholder="Write a message...">
-        <button onclick="sendMessage()">Send</button>
+    <!-- Chat Container -->
+    <div id="chatContainer"></div>
+    <input type="text" id="messageInput" placeholder="Write a message here...">
+    <button onclick="sendMessage()">Send</button>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div id="chatsTab" class="active" onclick="navigate('chats')">Chats</div>
+        <div id="gameTab" onclick="navigate('game')">Game</div>
+        <div id="profileTab" onclick="navigate('profile')">Profile</div>
+        <div id="communityTab" onclick="navigate('community')">Community</div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <div class="bottom-nav">
-        <a href="#" class="nav-item active">
-            <span class="nav-icon">💬</span>
-            <span class="nav-text">Chats</span>
-        </a>
-        <a href="#" class="nav-item">
-            <span class="nav-icon">🎮</span>
-            <span class="nav-text">Game</span>
-        </a>
-        <a href="#" class="nav-item">
-            <span class="nav-icon">👤</span>
-            <span class="nav-text">Profile</span>
-        </a>
-        <a href="#" class="nav-item">
-            <span class="nav-icon">🌐</span>
-            <span class="nav-text">Community</span>
-        </a>
-    </div>
-
-    <!-- Roleplay Name Prompt -->
-    <div id="overlay" class="overlay">
-        <div class="prompt-box">
-            <h2>Enter Your Roleplay Name</h2>
-            <input type="text" id="roleplayNameInput" placeholder="name_surname">
-            <button onclick="saveRoleplayName()">OK</button>
-        </div>
-    </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-analytics.js"></script>
 
     <script>
-        let roleplayName = '';
-        let firstVisit = true;
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaBdAdtxFI0j9gva30crAF4uIlu_6o14w",
+            authDomain: "publicchatapp-9a41a.firebaseapp.com",
+            databaseURL: "https://publicchatapp-9a41a-default-rtdb.firebaseio.com",
+            projectId: "publicchatapp-9a41a",
+            storageBucket: "publicchatapp-9a41a.appspot.com",
+            messagingSenderId: "386016909236",
+            appId: "1:386016909236:web:f700d4ee29f25b101bc4e1",
+            measurementId: "G-YBE4N8LJBQ"
+        };
 
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database(app);
+        const analytics = firebase.getAnalytics(app);
+
+        // Reference to the 'messages' node
+        const db = database.ref("messages");
+
+        // Function to send a message
         function sendMessage() {
-            const chatContainer = document.getElementById('chatContainer');
-            const chatInput = document.getElementById('chatInput');
-
-            if (chatInput.value.trim() !== '') {
-                const chatBubble = document.createElement('div');
-                chatBubble.classList.add('chat-bubble');
-
-                const profilePic = document.createElement('img');
-                profilePic.src = 'https://via.placeholder.com/40'; // Placeholder image
-                chatBubble.appendChild(profilePic);
-
-                const roleplayText = document.createElement('span');
-                roleplayText.classList.add('roleplay-name');
-                roleplayText.textContent = roleplayName ? `${roleplayName}: ` : '';
-                chatBubble.appendChild(roleplayText);
-
-                const message = document.createElement('div');
-                message.classList.add('message');
-                message.textContent = chatInput.value;
-                chatBubble.appendChild(message);
-
-                chatContainer.appendChild(chatBubble);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                chatInput.value = '';
+            const messageInput = document.getElementById("messageInput").value;
+            const roleplayName = localStorage.getItem("roleplayName") || "Anonymous";
+            if (messageInput.trim() !== "") {
+                db.push({
+                    name: roleplayName,
+                    message: messageInput,
+                    timestamp: Date.now()
+                });
+                document.getElementById("messageInput").value = ""; // Clear the input field
             }
         }
 
-        function filterMessages() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const chatBubbles = document.getElementsByClassName('chat-bubble');
+        // Listen for new messages
+        db.on('child_added', function(snapshot) {
+            const chat = snapshot.val();
+            displayMessage(chat.name, chat.message);
+        });
 
-            Array.from(chatBubbles).forEach(function(bubble) {
-                const messageText = bubble.querySelector('.message').textContent.toLowerCase();
-                if (messageText.includes(searchInput)) {
-                    bubble.style.display = 'flex';
+        function displayMessage(name, message) {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.innerHTML = `<strong>${name}:</strong> ${message}`;
+            chatContainer.appendChild(messageElement);
+        }
+
+        // Welcome Dialog Handling
+        function setRoleplayName() {
+            const roleplayName = document.getElementById("roleplayNameInput").value;
+            if (roleplayName.trim() !== "") {
+                localStorage.setItem("roleplayName", roleplayName);
+                document.getElementById("welcomeDialog").style.display = "none";
+                document.getElementById("searchContainer").classList.remove("hidden");
+            }
+        }
+
+        // Search Functionality
+        function searchMessages() {
+            const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+            const messages = document.querySelectorAll("#chatContainer .message");
+            messages.forEach(message => {
+                const text = message.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    message.style.display = "block";
                 } else {
-                    bubble.style.display = 'none';
+                    message.style.display = "none";
                 }
             });
         }
 
         function toggleSearch() {
-            const searchContainer = document.getElementById('searchContainer');
-            searchContainer.classList.toggle('collapsed');
+            const searchContainer = document.getElementById("searchContainer");
+            searchContainer.classList.toggle("hidden");
         }
 
-        function saveRoleplayName() {
-            const roleplayNameInput = document.getElementById('roleplayNameInput').value.trim();
-            if (roleplayNameInput) {
-                roleplayName = roleplayNameInput;
-                document.getElementById('overlay').style.display = 'none';
-            } else {
-                alert('Please enter your roleplay name.');
-            }
+        // Navigation Handling
+        function navigate(tab) {
+            const tabs = document.querySelectorAll(".navbar div");
+            tabs.forEach(t => t.classList.remove("active"));
+            document.getElementById(`${tab}Tab`).classList.add("active");
+            // Additional logic for navigating between tabs can be added here
         }
-
-        // Initialize the roleplay name prompt if it's the user's first visit
-        document.addEventListener('DOMContentLoaded', function() {
-            if (firstVisit) {
-                document.getElementById('overlay').style.display = 'flex';
-                firstVisit = false;
-            }
-        });
     </script>
 </body>
 </html>
